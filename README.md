@@ -4,22 +4,89 @@ This README outlines the details of collaborating on this Ember addon.
 
 ## Installation
 
-* `git clone` this repository
-* `npm install`
-* `bower install`
+`npm install ember-filter-params --save-dev`
 
-## Running
+## Usage
 
-* `ember server`
-* Visit your app at http://localhost:4200.
+This is meant to work like `queryParams` for a controller, adding to `filters` or
+ `multiFilters`. It generates a property for each filter with the following convention:
 
-## Running Tests
+```
+  "#{filter}Selected"
+```
 
-* `ember test`
-* `ember test --server`
+so if you added a filter named 'status', the property you'd update is 'statusSelected'.
 
-## Building
+We use an object instead of an array, to allow for overrides. Say for example you have 
+ two filters that are backed by the same model, this allows for an override. In a future version,
+ I'd like this to be optional, but this is still in its infancy.
 
-* `ember build`
+### Single Filters
 
-For more information on using ember-cli, visit [http://www.ember-cli.com/](http://www.ember-cli.com/).
+**controller**
+```
+import Ember from 'ember';
+import FilterParams from 'ember-filter-params/filter-params';
+
+Controller = Ember.Controller.extend(
+  FilterParams,
+  {
+    queryParams: ['status'],
+    filters: {
+      status: 'status'
+    },
+    ...
+  }
+)
+
+export default Controller;
+```
+
+**template**
+```
+  {{ember-selectize selection=statusSelected content=allStatuses optionValuePath="content.id" optionLabelPath="content.name"}}
+```
+
+selecting a filter will update the `status` queryParam, which will generate the following url:
+
+```
+  http://localhost:4200/some-route?status=1
+```
+
+
+### Multi Filters
+
+**controller**
+```
+import Ember from 'ember';
+import FilterParams from 'ember-filter-params/filter-params';
+
+Controller = Ember.Controller.extend(
+  FilterParams,
+  {
+    queryParams: ['statuses'],
+    multiFilters: {
+      statuses: 'status'
+    },
+    ...
+  }
+)
+
+export default Controller;
+```
+
+**template**
+```
+  {{ember-selectize multiple=true selection=statusSelected content=allStatuses optionValuePath="content.id" optionLabelPath="content.name"}}
+```
+
+adding a filter to your multi-select field, will update the `statuses` queryParam, which will generate the following url:
+
+```
+  http://localhost:4200/some-route?statuses=1,2
+```
+
+## TODO
+
+* Allow for array of `multiFilters` and `filters`, not just object.
+* Finish the TODO 
