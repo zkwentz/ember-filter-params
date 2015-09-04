@@ -1,7 +1,7 @@
 {
   "name": "ember-filter-params",
-  "version": "0.0.0",
-  "description": "The default blueprint for ember-cli addons.",
+  "version": "0.0.1",
+  "description": "Easy filter and multi-filtering via queryParams for your controllers",
   "directories": {
     "doc": "doc",
     "test": "tests"
@@ -11,7 +11,7 @@
     "start": "ember server",
     "test": "ember try:testall"
   },
-  "repository": "",
+  "repository": "https://github.com/zkwentz/ember-filter-params",
   "engines": {
     "node": ">= 0.10.0"
   },
@@ -39,7 +39,10 @@
     "ember-try": "0.0.6"
   },
   "keywords": [
-    "ember-addon"
+    "ember-addon",
+    "filters",
+    "multi filter",
+    "queryParams"
   ],
   "dependencies": {
     "ember-cli-babel": "^5.1.3"
