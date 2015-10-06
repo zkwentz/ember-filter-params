@@ -1,6 +1,6 @@
 {
   "name": "ember-filter-params",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Easy filter and multi-filtering via queryParams for your controllers",
   "directories": {
     "doc": "doc",
