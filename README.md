@@ -26,10 +26,10 @@ We use an object instead of an array, to allow for overrides. Say for example yo
 **controller**
 ```
 import Ember from 'ember';
-import FilterParams from 'ember-filter-params/filter-params';
+import FilterParamsMixin from 'you-app-name/mixins/filter-params';
 
 Controller = Ember.Controller.extend(
-  FilterParams,
+  FilterParamsMixin,
   {
     queryParams: ['status'],
     filters: {
@@ -59,10 +59,10 @@ selecting a filter will update the `status` queryParam, which will generate the 
 **controller**
 ```
 import Ember from 'ember';
-import FilterParams from 'ember-filter-params/filter-params';
+import FilterParamsMixin from 'you-app-name/mixins/filter-params';
 
 Controller = Ember.Controller.extend(
-  FilterParams,
+  FilterParamsMixin,
   {
     queryParams: ['statuses'],
     multiFilters: {
