@@ -29,15 +29,6 @@ FilterParamsMixin = Ember.Mixin.create(
       @set("#{multiFilter}Selected",Ember.A([]))
       @addObserver(multiFilter,@,'multiFilterParamObserver')
       @addObserver("#{multiFilter}Selected.@each",@,'multiFilterSelectedObserver')
-      @_actions["#{multiFilter.singularize()}Selected"] = ((selectedFilter) =>
-        selectedFilter.set('isFiltering',!selectedFilter.get('isFiltering'))
-        selectedFilters = @get("#{multiFilter}Selected")
-        if !!selectedFilters
-          if selectedFilter.get('isFiltering')
-            selectedFilters.pushObject(selectedFilter)
-          else
-            selectedFilters.removeObject(selectedFilter)
-      )
 
     return
 
@@ -87,7 +78,19 @@ FilterParamsMixin = Ember.Mixin.create(
 
     filter
 
+    actions:
+      selectAll: (filterName, filters) ->
+        filters.setEach('isFiltering',true)
+        @set("#{filterName}Selected",filters)
 
+      select: (filterName, filter) ->
+        filter.set('isFiltering',!filter.get('isFiltering'))
+        filters = @get("#{filterName}Selected")
+        if !!filters
+          if filter.get('isFiltering')
+            filters.pushObject(filter)
+          else
+            filters.removeObject(filter)
 )
 
 `export default FilterParamsMixin`
