@@ -29,6 +29,15 @@ FilterParamsMixin = Ember.Mixin.create(
       @set("#{multiFilter}Selected",Ember.A([]))
       @addObserver(multiFilter,@,'multiFilterParamObserver')
       @addObserver("#{multiFilter}Selected.@each",@,'multiFilterSelectedObserver')
+      @_actions["#{multiFilter.singularize()}Selected"] = ((selectedFilter) =>
+        selectedFilter.set('isFiltering',!selectedFilter.get('isFiltering'))
+        selectedFilters = @get("#{multiFilter}Selected")
+        if !!selectedFilters
+          if selectedFilter.get('isFiltering')
+            selectedFilters.pushObject(selectedFilter)
+          else
+            selectedFilters.removeObject(selectedFilter)
+      )
 
     return
 
@@ -41,7 +50,8 @@ FilterParamsMixin = Ember.Mixin.create(
       filterParams = if Ember.isArray(filterParam) then filterParam else filterParam.split(',')
       filterParams.forEach (fp) =>
         multiFilterKey = @get('multiFilters')[multiFilter]
-        multiFilterSelected.pushObject(@store.find(multiFilterKey,fp))
+        multiFilterRecord = @store.find(multiFilterKey,fp)
+        multiFilterSelected.pushObject(multiFilterRecord)
 
     Ember.RSVP.all(multiFilterSelected).then((resolvedMultiFilters) =>
       multiFilterSelected = resolvedMultiFilters
@@ -54,6 +64,7 @@ FilterParamsMixin = Ember.Mixin.create(
     filterSelected = @get(key.replace('@each',''))
 
     if !!filterSelected
+      filterSelected.setEach('isFiltering',true)
       filter = filterSelected.mapBy('id')
       if filter.length is 0
         @set(filterParam,undefined)
