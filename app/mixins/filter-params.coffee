@@ -78,19 +78,25 @@ FilterParamsMixin = Ember.Mixin.create(
 
     filter
 
-    actions:
-      selectAll: (filterName, filters) ->
-        filters.setEach('isFiltering',true)
-        @set("#{filterName}Selected",filters)
+  _selectAll: (filterName, filters) ->
+    filters.setEach('isFiltering',true)
+    @set("#{filterName}Selected",filters)
 
-      select: (filterName, filter) ->
-        filter.set('isFiltering',!filter.get('isFiltering'))
-        filters = @get("#{filterName}Selected")
-        if !!filters
-          if filter.get('isFiltering')
-            filters.pushObject(filter)
-          else
-            filters.removeObject(filter)
+  _select: (filterName, filter) ->
+    filter.set('isFiltering',!filter.get('isFiltering'))
+    filters = @get("#{filterName}Selected")
+    if !!filters
+      if filter.get('isFiltering')
+        filters.pushObject(filter)
+      else
+        filters.removeObject(filter)
+
+  actions:
+    select: (filterName, filters) ->
+      if Ember.isArray(filters)
+        _selectAll(filterName, filters)
+      else
+        _select(filterName, filters)
 )
 
 `export default FilterParamsMixin`
