@@ -81,6 +81,7 @@ FilterParamsMixin = Ember.Mixin.create(
   _selectAll: (filterName, filters) ->
     filters.setEach('isFiltering',true)
     @set("#{filterName}Selected",filters)
+    return
 
   _select: (filterName, filter) ->
     filter.set('isFiltering',!filter.get('isFiltering'))
@@ -90,13 +91,14 @@ FilterParamsMixin = Ember.Mixin.create(
         filters.pushObject(filter)
       else
         filters.removeObject(filter)
+    return
 
   actions:
     select: (filterName, filters) ->
       if Ember.isArray(filters)
-        _selectAll(filterName, filters)
+        @_selectAll(filterName, filters)
       else
-        _select(filterName, filters)
+        @_select(filterName, filters)
 )
 
 `export default FilterParamsMixin`
