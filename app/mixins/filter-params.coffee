@@ -38,21 +38,20 @@ FilterParamsMixin = Ember.Mixin.create(
     filterParam = @get(multiFilter)
 
     if !!filterParam
-      filterParams = if Ember.isArray(filterParam) then filterParam else filterParam.split(',')
-      filterParams.forEach (fp) =>
-        multiFilterKey = @get('multiFilters')[multiFilter]
-        multiFilterRecord = @store.find(multiFilterKey,fp)
-        multiFilterSelected.pushObject(multiFilterRecord)
-
-    Ember.RSVP.all(multiFilterSelected).then((resolvedMultiFilters) =>
-      multiFilterSelected = resolvedMultiFilters
-    ).finally =>
-      @removeObserver(multiFilter)
-      @set("#{multiFilter}Selected",multiFilterSelected)
+      @_allFilters(multiFilter).then((multiFilters) =>
+        filterParams = if Ember.isArray(filterParam) then filterParam else filterParam.split(',')
+        filterParams.forEach (fp) =>
+          multiFilterSelected.pushObject(multiFilters.findBy('id',fp))
+      ).finally =>
+        @removeObserver(multiFilter)
+        @set("all#{filterParam.capitalize()}Selected",@_allSelected(filterParam))
+        @set("#{multiFilter}Selected",multiFilterSelected)
 
   multiFilterSelectedObserver: (sender,key) ->
     filterParam = key.replace('Selected.@each','')
-    filterSelected = @get(key.replace('@each',''))
+    filterSelected = @get(key.replace('.@each',''))
+
+    @set("all#{filterParam.capitalize()}Selected",@_allSelected(filterParam))
 
     if !!filterSelected
       filterSelected.setEach('isFiltering',true)
@@ -70,15 +69,21 @@ FilterParamsMixin = Ember.Mixin.create(
     if !!value
       @set(key,value.id)
 
-    filterIds = @get(key)
+    filterId = @get(key)
 
-    if !!filterIds
+    if !!filterId
       key = @get('filters')[key]
-      filter = @store.find(key,filterIds)
+      @get(key).then (filters) =>
+        filters.findBy('id',filterId)
 
-    filter
+  _allSelected: (filterParam) ->
+    @_allFilters(filterParam).isEvery('isFiltering')
 
-  _selectAll: (filterName, filters) ->
+  _allFilters: (filterName) ->
+    @get(@get('multiFilters')[filterName])
+
+  _selectMultiple: (filterName, filters) ->
+    @_allFilters(filterName).setEach('isFiltering',false)
     filters.setEach('isFiltering',true)
     @set("#{filterName}Selected",filters)
     return
@@ -94,9 +99,17 @@ FilterParamsMixin = Ember.Mixin.create(
     return
 
   actions:
+    selectAll: (filterName) ->
+      allFilters = @_allFilters(filterName)
+      allSelected = @_allSelected(filterName)
+      allFilters.setEach('isFiltering',!allSelected)
+      if allSelected
+        @set("#{filterName}Selected",[])
+      else
+        @set("#{filterName}Selected",allFilters.get('content'))
     select: (filterName, filters) ->
       if Ember.isArray(filters)
-        @_selectAll(filterName, filters)
+        @_selectMultiple(filterName, filters)
       else
         @_select(filterName, filters)
 )
