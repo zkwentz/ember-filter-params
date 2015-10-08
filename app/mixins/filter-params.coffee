@@ -69,10 +69,7 @@ FilterParamsMixin = Ember.Mixin.create(
     @_allFilters(key).filterBy('isFiltering')
 
   multiFilterObserver: (sender, multiFilter) ->
-    filterParams = @get(multiFilter)?.split(',') || []
-    @_allFilters(multiFilter).then (multiFilters) =>
-      multiFilters.forEach (filter) =>
-        filter.set('isFiltering',filterParams?.contains(filter.get('id')))
+    @_allFilters(multiFilter).setEach('isFiltering',false) unless @get(multiFilter)
 
   multiFilterSelectedObserver: (sender, key) ->
     key = key.replace('.@each.id','')
