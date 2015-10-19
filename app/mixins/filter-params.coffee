@@ -38,15 +38,17 @@ FilterParamsMixin = Ember.Mixin.create(
       filterParam = @get(multiFilter)
 
       filterParams = filterParam?.split(',') || []
-      @_allFilters(multiFilter).then((multiFilters) =>
-        multiFilters.forEach (filter) =>
-          filter.set('isFiltering',filterParams?.contains(filter.get('id')))
-      ).finally =>
-        @set("#{multiFilter}Selected",Ember.computed("#{@get('multiFilters')[multiFilter]}.@each.isFiltering",@multiFilterSelected))
-        @set("#{multiFilter}AllSelected",Ember.computed("#{@get('multiFilters')[multiFilter]}.@each.isFiltering",@multiFilterAllSelected))
-        @addObserver("#{multiFilter}Selected.@each.id",@,'multiFilterSelectedObserver')
-        @removeObserver(multiFilter)
-        @addObserver(multiFilter,@,'multiFilterObserver')
+      allFilters = @_allFilters(multiFilter)
+      if !!allFilters
+        allFilters?.then((multiFilters) =>
+          multiFilters.forEach (filter) =>
+            filter.set('isFiltering',filterParams?.contains(filter.get('id')))
+        ).finally =>
+          @set("#{multiFilter}Selected",Ember.computed("#{@get('multiFilters')[multiFilter]}.@each.isFiltering",@multiFilterSelected))
+          @set("#{multiFilter}AllSelected",Ember.computed("#{@get('multiFilters')[multiFilter]}.@each.isFiltering",@multiFilterAllSelected))
+          @addObserver("#{multiFilter}Selected.@each.id",@,'multiFilterSelectedObserver')
+          @removeObserver(multiFilter)
+          @addObserver(multiFilter,@,'multiFilterObserver')
     )
 
   filterSelected: (key,value,prevValue) ->
@@ -61,8 +63,9 @@ FilterParamsMixin = Ember.Mixin.create(
 
     if !!filterId
       key = @get('filters')[key]
-      @get(key).then (filters) =>
-        filters.findBy('id',filterId)
+      if !!key
+        @get(key)?.then (filters) =>
+          filters.findBy('id',filterId)
 
   multiFilterSelected: (key,value,prevValue) ->
     key = key.replace('Selected','')
